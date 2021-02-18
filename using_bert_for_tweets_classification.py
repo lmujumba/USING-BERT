@@ -285,93 +285,25 @@ Let's now split our datAset into a training set and testing set
 Rename dataset to batch_1
 """
 
-batch_1 = dataset[:]
+X=features
+y = dataset['label']
 
-batch_1['label'].value_counts()
+"""Staritified Kfold cross validation"""
 
-print (f'G = {len(dataset[dataset["label"]=="G"])}')
-print (f'NG = {len(dataset[dataset["label"]=="NG"])}')
+from sklearn.model_selection import KFold
 
-labels = batch_1['label']
-
-from sklearn.model_selection import train_test_split
-train_features, test_features, train_labels, test_labels = train_test_split(features, labels)
+skf = KFold(n_splits = 10, shuffle = True, random_state = 18)
+#result = next(skf.split(dataset), None)
+#print (result)
+for train_index, test_index in skf.split(X, y):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+#train = dataset.iloc[result[0]]
+#test =  dataset.iloc[result[1]]
 
 """LOAD MODELS
 
 """
-
-from sklearn.ensemble import *
-
-LDA=LinearDiscriminantAnalysis()
-LDA.fit(train_features, train_labels)
-scores = cross_val_score(LDA, train_features, train_labels)
-print("LDA Classifier score: %0.3f " % (scores.mean()))
-
-KNN= KNeighborsClassifier()
-KNN.fit(train_features, train_labels)
-scores = cross_val_score(KNN, train_features, train_labels)
-print("KNN Classifier score: %0.3f " % (scores.mean()))
-
-CART= DecisionTreeClassifier()
-CART.fit(train_features, train_labels)
-scores = cross_val_score(CART, train_features, train_labels)
-print("CART Classifier score: %0.3f" % (scores.mean() ))
-
-NB= GaussianNB()
-NB.fit(train_features, train_labels)
-scores = cross_val_score(NB, train_features, train_labels)
-print("NB Classifier score: %0.3f" % (scores.mean()))
-
-SVM=SVC()
-SVM.fit(train_features, train_labels)
-scores = cross_val_score(SVM, train_features, train_labels)
-print("SVM Classifier score: %0.3f" % (scores.mean()))
-
-LightGBM=LGBMClassifier()
-LightGBM.fit(train_features, train_labels)
-scores = cross_val_score(LightGBM, train_features, train_labels)
-print("LGBM Classifier score: %0.3f" % (scores.mean()))
-
-
-from xgboost import XGBClassifier
-XGBClassifier=XGBClassifier()
-XGBClassifier.fit(train_features, train_labels)
-scores = cross_val_score(XGBClassifier, train_features, train_labels)
-print("XGBC Classifier score: %0.3f" % (scores.mean()))
-
-
-from sklearn.ensemble import BaggingClassifier
-BaggingClassifier=BaggingClassifier()
-BaggingClassifier.fit(train_features, train_labels)
-scores = cross_val_score(BaggingClassifier, train_features, train_labels)
-print("Bagging Classifier score: %0.3f " % (scores.mean()))
-
-from sklearn.linear_model import LogisticRegression
-LogisticRegression=LogisticRegression(random_state=42, solver='liblinear',multi_class='auto')
-LogisticRegression.fit(train_features, train_labels)
-scores = cross_val_score(LogisticRegression, train_features, train_labels)
-print("Logistic Regression Classifier score: %0.3f" % (scores.mean()))
-
-from sklearn.ensemble import *
-RandomForestClassifier=RandomForestClassifier(n_estimators = 35,random_state = 42)
-RandomForestClassifier.fit(train_features, train_labels)
-scores = cross_val_score(RandomForestClassifier, train_features, train_labels)
-print("Random Forest Classifier score: %0.3f" % (scores.mean()))
-
-#GradientBoostClassifier=GradientBoostingClassifier()
-#GradientBoostingClassifier.fit(train_features,train_labels)
-#scores = cross_val_score(GradientBoostingClassifier, train_features, train_labels)
-#scores=GradientBoostingClassifier.score(train_features, train_labels)
-#print("Gradient Boost Classifier score: %0.3f " % (scores.mean(),))
-
-AdaBoost=AdaBoostClassifier()
-AdaBoost.fit(train_features, train_labels)
-scores = cross_val_score(AdaBoost, train_features, train_labels)
-print("Ada Classifier score: %0.3f " % (scores.mean()))
-
-with open('FinalReport11.txt','w') as file:
-  file.write(str(scores))
 
 # Comparison of Classifiers
 from sklearn.linear_model import LogisticRegression
@@ -394,17 +326,29 @@ models = {
             'LightGBM':LGBMClassifier()
             }
 
-"""THIS FUNCTIONs BELOW  HAVEN'T IMPLEMENTED"""
+from sklearn.metrics import accuracy_score
 
-f = open('FianlReport11.txt','w')
-train_features, test_features, train_labels, test_labels = train_test_split(features, labels)
-for name, model in models.items():
-    clf = model
-   # clf.fit(X_train.toarray(), y_train)
-    clf.fit(train_features, train_labels)
-    y_pred = clf.predict(train_labels)
-    #y_pred = clf.predict(X1)
-    #print(y_predict)
+with open('NewFinalReport.txt','w') as file:
+  file.writelines
+  for name, model in models.items():
+      clf = model
+      clf.fit(X_train, y_train)
+      y_pred = clf.predict(X_test)
+      #y_pred = clf.predict(X1)
+      #print(y_pred)
+    
+      print('Accuracy score of ' + name , accuracy_score(y_test,y_pred))
+
+      f.writelines('%s,%s\n,%s\n'%('Accuracy score of '+ name , accuracy_score(y_test, y_pred),classification_report(y_test, y_pred)))
+
+      print('Accuracy score of '+ name , accuracy_score(y_test, y_pred),'\n',classification_report(y_test, y_pred))
+      
+      print(confusion_matrix(y_test, y_pred))
+
+#from sklearn.model_selection import train_test_split
+#train_features, test_features, train_labels, test_labels = train_test_split(features, labels)
+
+
 
 # it is the code when i use another dataset to train the model. ok    
 
